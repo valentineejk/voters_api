@@ -1,7 +1,5 @@
 package main
 
-//pascalcase for left and snake or lower case for the right
-
 type Voter struct {
 	ID        string `json:"id"`
 	FullName  string `json:"full_name"`
@@ -14,8 +12,6 @@ type Voter struct {
 	CreatedAt string `json:"created_at"`
 }
 
-// Validation
-
 type RegisterVoterRequest struct {
 	FullName string `json:"full_name"`
 	NIN      string `json:"nin"`
@@ -23,11 +19,6 @@ type RegisterVoterRequest struct {
 	State    string `json:"state"`
 	Lga      string `json:"lga"`
 	Phone    string `json:"phone"`
-}
-
-type PaginatedResponse struct {
-	Data []Voter       `json:"data"`
-	Meta PaginatedMeta `json:"meta"`
 }
 
 type PaginatedMeta struct {

@@ -11,7 +11,6 @@ import (
 	"sync"
 )
 
-// come back to update voters struct
 var (
 	mu       sync.RWMutex
 	store    = map[string]Voter{}
@@ -20,9 +19,9 @@ var (
 )
 
 var (
-	ninPattern    = regexp.MustCompile(`^d{11}$`)
-	phonePattern  = regexp.MustCompile(`^(+234|0)[7-9][0-1]d{8}$`)
-	voterIDPat    = regexp.MustCompile(`^VTR-d{5}$`)
+	ninPattern    = regexp.MustCompile(`^\d{11}$`)
+	phonePattern  = regexp.MustCompile(`^(\+234|0)[7-9][0-1]\d{8}$`)
+	voterIDPat    = regexp.MustCompile(`^VTR-\d{5}$`)
 	validStatuses = map[string]bool{
 		"pending": true, "verified": true, "rejected": true,
 	}
@@ -34,6 +33,7 @@ var (
 
 // handlers
 func get_all_voters(w http.ResponseWriter, r *http.Request) {
+
 	q := r.URL.Query()
 	state := strings.ToLower(q.Get("state"))
 	status := strings.ToLower(q.Get("status"))
@@ -98,6 +98,7 @@ func get_all_voters(w http.ResponseWriter, r *http.Request) {
 }
 
 func get_one_voter(w http.ResponseWriter, r *http.Request) {
+
 	id := r.PathValue("id") //id from param
 
 	if !voterIDPat.MatchString(id) {
@@ -121,7 +122,9 @@ func get_one_voter(w http.ResponseWriter, r *http.Request) {
 func register_voter(w http.ResponseWriter, r *http.Request) {
 
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
+
 	var req RegisterVoterRequest
+
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, http.StatusUnsupportedMediaType, "Content type must be app/json")
 		return
@@ -146,7 +149,7 @@ func register_voter(w http.ResponseWriter, r *http.Request) {
 	vo := Voter{
 		ID:       generateVoterID(),
 		FullName: req.FullName,
-		NIN:      req.FullName,
+		NIN:      req.NIN,
 		DOB:      req.DOB,
 		State:    req.State,
 		Lga:      req.Lga,
@@ -233,17 +236,19 @@ func main() {
 	PORT := ":8000"
 	mux := http.NewServeMux()
 
-	//routes
-
 	//health
 	mux.HandleFunc("GET /api/v1/health", healthCheck)
 
 	//voter routes
-	mux.HandleFunc("GET /api/v1/voters", healthCheck)
-	mux.HandleFunc("POST /api/v1/voters", healthCheck)
-	mux.HandleFunc("GET /api/v1/voters/{id}", healthCheck)
-	mux.HandleFunc("DELETE /api/v1/voters/{id}", healthCheck)
-	mux.HandleFunc("PUT /api/v1/voters/{id}/status", healthCheck)
+	mux.HandleFunc("GET /api/v1/voters", get_all_voters)
+
+	mux.HandleFunc("POST /api/v1/voters", register_voter)
+
+	mux.HandleFunc("GET /api/v1/voters/{id}", get_one_voter)
+
+	mux.HandleFunc("DELETE /api/v1/voters/{id}", delete_voter)
+
+	mux.HandleFunc("PUT /api/v1/voters/{id}/status", update_voter_status)
 
 	//server
 	fmt.Println("server started")
