@@ -19,9 +19,10 @@ var (
 )
 
 var (
-	ninPattern    = regexp.MustCompile(`^\d{11}$`)
-	phonePattern  = regexp.MustCompile(`^(\+234|0)[7-9][0-1]\d{8}$`)
-	voterIDPat    = regexp.MustCompile(`^VTR-\d{5}$`)
+	ninPattern   = regexp.MustCompile(`^\d{11}$`)
+	phonePattern = regexp.MustCompile(`^(\+234|0)[7-9][0-1]\d{8}$`)
+	voterIDPat   = regexp.MustCompile(`^VTR-\d{5}$`)
+
 	validStatuses = map[string]bool{
 		"pending": true, "verified": true, "rejected": true,
 	}
