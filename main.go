@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 )
 
 var (
@@ -148,14 +149,15 @@ func register_voter(w http.ResponseWriter, r *http.Request) {
 	}
 	////////////////////////////////////////////////////////
 	vo := Voter{
-		ID:       generateVoterID(),
-		FullName: req.FullName,
-		NIN:      req.NIN,
-		DOB:      req.DOB,
-		State:    req.State,
-		Lga:      req.Lga,
-		Phone:    req.Phone,
-		Status:   "pending",
+		ID:        generateVoterID(),
+		FullName:  req.FullName,
+		NIN:       req.NIN,
+		DOB:       req.DOB,
+		State:     req.State,
+		Lga:       req.Lga,
+		Phone:     req.Phone,
+		Status:    "pending",
+		CreatedAt: time.Now().Format(time.DateTime),
 	}
 
 	store[vo.ID] = vo
