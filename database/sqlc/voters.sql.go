@@ -32,7 +32,7 @@ func (q *Queries) CountVoters(ctx context.Context, arg CountVotersParams) (int64
 const createVoter = `-- name: CreateVoter :one
 INSERT INTO voters (id, full_name, nin, dob, state, lga, phone)
 VALUES ($1, $2, $3, $4, $5, $6, $7)
-RETURNING id, full_name, nin, dob, state, lga, phone, status, created_at
+RETURNING id, full_name, nin, dob, state, lga, phone, status, created_at, voter_id
 `
 
 type CreateVoterParams struct {
@@ -66,6 +66,7 @@ func (q *Queries) CreateVoter(ctx context.Context, arg CreateVoterParams) (Voter
 		&i.Phone,
 		&i.Status,
 		&i.CreatedAt,
+		&i.VoterID,
 	)
 	return i, err
 }
@@ -94,7 +95,7 @@ func (q *Queries) ExistsVoterByNIN(ctx context.Context, nin string) (bool, error
 }
 
 const getVoter = `-- name: GetVoter :one
-SELECT id, full_name, nin, dob, state, lga, phone, status, created_at FROM voters
+SELECT id, full_name, nin, dob, state, lga, phone, status, created_at, voter_id FROM voters
 WHERE id = $1
 `
 
@@ -111,12 +112,13 @@ func (q *Queries) GetVoter(ctx context.Context, id string) (Voter, error) {
 		&i.Phone,
 		&i.Status,
 		&i.CreatedAt,
+		&i.VoterID,
 	)
 	return i, err
 }
 
 const getVoterByNIN = `-- name: GetVoterByNIN :one
-SELECT id, full_name, nin, dob, state, lga, phone, status, created_at FROM voters
+SELECT id, full_name, nin, dob, state, lga, phone, status, created_at, voter_id FROM voters
 WHERE nin = $1
 `
 
@@ -133,12 +135,13 @@ func (q *Queries) GetVoterByNIN(ctx context.Context, nin string) (Voter, error) 
 		&i.Phone,
 		&i.Status,
 		&i.CreatedAt,
+		&i.VoterID,
 	)
 	return i, err
 }
 
 const listVoters = `-- name: ListVoters :many
-SELECT id, full_name, nin, dob, state, lga, phone, status, created_at FROM voters
+SELECT id, full_name, nin, dob, state, lga, phone, status, created_at, voter_id FROM voters
 WHERE ($3::text IS NULL OR state = $3)
   AND ($4::text IS NULL OR status = $4)
 ORDER BY created_at DESC
@@ -176,6 +179,7 @@ func (q *Queries) ListVoters(ctx context.Context, arg ListVotersParams) ([]Voter
 			&i.Phone,
 			&i.Status,
 			&i.CreatedAt,
+			&i.VoterID,
 		); err != nil {
 			return nil, err
 		}
@@ -191,7 +195,7 @@ const updateVoterStatus = `-- name: UpdateVoterStatus :one
 UPDATE voters
 SET status = $2
 WHERE id = $1
-RETURNING id, full_name, nin, dob, state, lga, phone, status, created_at
+RETURNING id, full_name, nin, dob, state, lga, phone, status, created_at, voter_id
 `
 
 type UpdateVoterStatusParams struct {
@@ -212,6 +216,7 @@ func (q *Queries) UpdateVoterStatus(ctx context.Context, arg UpdateVoterStatusPa
 		&i.Phone,
 		&i.Status,
 		&i.CreatedAt,
+		&i.VoterID,
 	)
 	return i, err
 }

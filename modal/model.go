@@ -1,7 +1,8 @@
-package main
+package model
 
 type Voter struct {
 	ID        string `json:"id"`
+	VoterID   string `json:"voter_id"`
 	FullName  string `json:"full_name"`
 	NIN       string `json:"nin"`
 	DOB       string `json:"dob"`
@@ -13,12 +14,12 @@ type Voter struct {
 }
 
 type RegisterVoterRequest struct {
-	FullName string `json:"full_name"`
-	NIN      string `json:"nin"`
-	DOB      string `json:"dob"`
-	State    string `json:"state"`
-	Lga      string `json:"lga"`
-	Phone    string `json:"phone"`
+	FullName string `json:"full_name" binding:"required,min=3"`
+	NIN      string `json:"nin" binding:"required"`
+	DOB      string `json:"dob" binding:"required"`
+	State    string `json:"state" binding:"required"`
+	Lga      string `json:"lga" binding:"required"`
+	Phone    string `json:"phone" binding:"required"`
 }
 
 type PaginatedMeta struct {

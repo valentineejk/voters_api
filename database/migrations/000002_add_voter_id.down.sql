@@ -1,0 +1,2 @@
+ALTER TABLE voters DROP COLUMN IF EXISTS voter_id;
+DROP SEQUENCE IF EXISTS voter_id_seq;

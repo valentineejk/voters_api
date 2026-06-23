@@ -1,4 +1,4 @@
-package postgres
+package database
 
 import (
 	"context"
@@ -10,24 +10,19 @@ import (
 	dbq "github.com/valentineejk/voters_api/database/sqlc"
 )
 
-func Connection() *dbq.Queries {
+func Connection() (*dbq.Queries, *pgxpool.Pool) {
 
-	dbURL := os.Getenv("DATABASE_URL")
-
-	if dbURL == "" {
-		log.Fatal("DATABASE_URL is required")
-	}
+	DATABASE_URL := os.Getenv("DATABASE_URL")
 
 	// pgxpool manages a pool of connections
-	// never open a new connection per request
-	pool, err := pgxpool.New(context.Background(), dbURL)
+	pool, err := pgxpool.New(context.Background(), DATABASE_URL)
 	if err != nil {
 		log.Fatalf("cannot connect to database: %v", err)
 	}
-	defer pool.Close()
 
 	// ping to verify connection is alive at startup
 	if err := pool.Ping(context.Background()); err != nil {
+		pool.Close()
 		log.Fatalf("database ping failed: %v", err)
 	}
 	fmt.Println("connected to postgres")
@@ -35,5 +30,5 @@ func Connection() *dbq.Queries {
 	// db.New wraps the pool and gives us typed query methods
 	queries := dbq.New(pool)
 
-	return queries
+	return queries, pool
 }

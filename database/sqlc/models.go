@@ -18,4 +18,5 @@ type Voter struct {
 	Phone     string             `json:"phone"`
 	Status    string             `json:"status"`
 	CreatedAt pgtype.Timestamptz `json:"created_at"`
+	VoterID   string             `json:"voter_id"`
 }
