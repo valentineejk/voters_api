@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -235,24 +237,29 @@ func healthCheck(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	PORT := ":8000"
-	mux := http.NewServeMux()
+	// mux := http.NewServeMux()
 
 	//health
-	mux.HandleFunc("GET /api/v1/health", healthCheck)
+	// mux.HandleFunc("GET /api/v1/health", healthCheck)
 
-	//voter routes
-	mux.HandleFunc("GET /api/v1/voters", get_all_voters)
+	// //voter routes
+	// mux.HandleFunc("GET /api/v1/voters", get_all_voters)
 
-	mux.HandleFunc("POST /api/v1/voters", register_voter)
+	// mux.HandleFunc("POST /api/v1/voters", register_voter)
 
-	mux.HandleFunc("GET /api/v1/voters/{id}", get_one_voter)
+	// mux.HandleFunc("GET /api/v1/voters/{id}", get_one_voter)
 
-	mux.HandleFunc("DELETE /api/v1/voters/{id}", delete_voter)
+	// mux.HandleFunc("DELETE /api/v1/voters/{id}", delete_voter)
 
-	mux.HandleFunc("PUT /api/v1/voters/{id}/status", update_voter_status)
+	// mux.HandleFunc("PUT /api/v1/voters/{id}/status", update_voter_status)
 
 	//server
 	fmt.Println("server started")
-	http.ListenAndServe(PORT, mux)
+	// http.ListenAndServe(PORT, mux)
+
+	r := gin.Default()
+	v1 := r.Group("/api/v1")
+	v1.GET("/health")
+	r.Run(PORT)
 
 }
