@@ -81,6 +81,29 @@ func (q *Queries) DeleteVoter(ctx context.Context, id string) error {
 	return err
 }
 
+const getVoterByVoterID = `-- name: GetVoterByVoterID :one
+SELECT id, full_name, nin, dob, state, lga, phone, status, created_at, voter_id FROM voters
+WHERE voter_id = $1
+`
+
+func (q *Queries) GetVoterByVoterID(ctx context.Context, voterID string) (Voter, error) {
+	row := q.db.QueryRow(ctx, getVoterByVoterID, voterID)
+	var i Voter
+	err := row.Scan(
+		&i.ID,
+		&i.FullName,
+		&i.Nin,
+		&i.Dob,
+		&i.State,
+		&i.Lga,
+		&i.Phone,
+		&i.Status,
+		&i.CreatedAt,
+		&i.VoterID,
+	)
+	return i, err
+}
+
 const existsVoterByNIN = `-- name: ExistsVoterByNIN :one
 SELECT EXISTS (
     SELECT 1 FROM voters WHERE nin = $1

@@ -15,6 +15,7 @@ type Querier interface {
 	ExistsVoterByNIN(ctx context.Context, nin string) (bool, error)
 	GetVoter(ctx context.Context, id string) (Voter, error)
 	GetVoterByNIN(ctx context.Context, nin string) (Voter, error)
+	GetVoterByVoterID(ctx context.Context, id string) (Voter, error)
 	ListVoters(ctx context.Context, arg ListVotersParams) ([]Voter, error)
 	UpdateVoterStatus(ctx context.Context, arg UpdateVoterStatusParams) (Voter, error)
 }
