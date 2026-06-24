@@ -15,7 +15,7 @@ type Voter struct {
 
 type RegisterVoterRequest struct {
 	FullName string `json:"full_name" binding:"required,min=3"`
-	NIN      string `json:"nin" binding:"required"`
+	NIN      string `json:"nin" binding:"required, numeric"`
 	DOB      string `json:"dob" binding:"required"`
 	State    string `json:"state" binding:"required"`
 	Lga      string `json:"lga" binding:"required"`
@@ -29,4 +29,8 @@ type PaginatedMeta struct {
 	TotalPages int  `json:"total_pages"`
 	HasNext    bool `json:"has_next"`
 	HasPrev    bool `json:"has_prev"`
+}
+
+type UpdateVoterStatusRequest struct {
+	Status string `json:"status" binding:"required"`
 }
