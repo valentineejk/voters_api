@@ -31,6 +31,10 @@ func main() {
 
 	v1.GET("/voters/:id", h.Get_one_voter)
 
+	v1.POST("/polling-stations", h.AddPollingStation)
+	v1.GET("/polling-stations", h.GetAllPollingStations)
+	v1.GET("/polling-stations/:id", h.GetPollingStation)
+
 	v1.GET("/health", h.HealthCheck)
 
 	r.Run(PORT)
