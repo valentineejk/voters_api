@@ -31,6 +31,8 @@ func main() {
 
 	v1.GET("/voters/:id", h.Get_one_voter)
 
+	v1.GET("/voters", h.GetAllVoters)
+
 	v1.GET("/health", h.HealthCheck)
 
 	r.Run(PORT)
