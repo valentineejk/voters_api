@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"regexp"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -210,41 +211,53 @@ func (h *Handler) Register_voter(c *gin.Context) {
 
 // }
 
-// func update_voter_status(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Update_voter_status(c *gin.Context) {
 
-// 	id := r.PathValue("id")
+	id := c.Param("id")
 
-// 	var req struct {
-// 		Status string `json:"status"`
-// 	}
+	if !voterIDPat.MatchString(id) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid voter id",
+		})
+		return
+	}
 
-// 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-// 		writeError(w, http.StatusBadRequest, "invalid JSON")
-// 		return
-// 	}
-// 	req.Status = strings.TrimSpace(strings.ToLower(req.Status))
-// 	if req.Status == "" {
-// 		writeError(w, http.StatusUnprocessableEntity, "status is required")
-// 		return
-// 	}
-// 	if !validStatuses[req.Status] {
-// 		writeError(w, http.StatusUnprocessableEntity,
-// 			"status must be: pending, verified or rejected")
-// 		return
-// 	}
+	var req model.UpdateVoterStatusRequest
 
-// 	mu.Lock()
-// 	defer mu.Unlock()
-// 	vo, ok := store[id]
-// 	if !ok {
-// 		writeError(w, http.StatusNotFound, "voter not found")
-// 	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "invalid body data",
+		})
+		return
+	}
 
-// 	vo.Status = req.Status
-// 	store[id] = vo
-// 	writeJSON(w, http.StatusOK, vo)
+	req.Status = strings.TrimSpace(strings.ToLower(req.Status))
+	if req.Status == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "status is required",
+			"message": "invalid body data",
+		})
+		return
+	}
+	voter, err := h.queries.UpdateVoterStatus(c.Request.Context(), dbq.UpdateVoterStatusParams{
+		ID:     id,
+		Status: req.Status,
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err,
+			"message": "failed to update voter status",
+		})
+		return
+	}
 
-// }
+	c.JSON(http.StatusOK, gin.H{
+		"data":    voter,
+		"message": "voter status updated succesfully",
+	})
+
+}
 
 
 func (h *Handler) AddPollingStation(c *gin.Context) {

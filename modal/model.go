@@ -15,7 +15,7 @@ type Voter struct {
 
 type RegisterVoterRequest struct {
 	FullName string `json:"full_name" binding:"required,min=3"`
-	NIN      string `json:"nin" binding:"required"`
+	NIN      string `json:"nin" binding:"required, numeric"`
 	DOB      string `json:"dob" binding:"required"`
 	State    string `json:"state" binding:"required"`
 	Lga      string `json:"lga" binding:"required"`
@@ -54,4 +54,7 @@ type CreatePollingStationRequest struct {
 	Address   string   `json:"address"`
 	Latitude  *float64 `json:"latitude"`
 	Longitude *float64 `json:"longitude"`
+}
+type UpdateVoterStatusRequest struct {
+	Status string `json:"status" binding:"required"`
 }
