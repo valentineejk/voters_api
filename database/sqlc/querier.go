@@ -10,12 +10,19 @@ import (
 
 type Querier interface {
 	CountVoters(ctx context.Context, arg CountVotersParams) (int64, error)
+	CreateRefreshToken(ctx context.Context, arg CreateRefreshTokenParams) (RefreshToken, error)
+	CreateUser(ctx context.Context, arg CreateUserParams) (User, error)
 	CreateVoter(ctx context.Context, arg CreateVoterParams) (Voter, error)
 	DeleteVoter(ctx context.Context, id string) error
 	ExistsVoterByNIN(ctx context.Context, nin string) (bool, error)
+	GetRefreshToken(ctx context.Context, tokenHash string) (RefreshToken, error)
+	GetUserByEmail(ctx context.Context, email string) (User, error)
+	GetUserByID(ctx context.Context, id string) (User, error)
 	GetVoter(ctx context.Context, id string) (Voter, error)
 	GetVoterByNIN(ctx context.Context, nin string) (Voter, error)
 	ListVoters(ctx context.Context, arg ListVotersParams) ([]Voter, error)
+	RevokeAllUserTokens(ctx context.Context, userID string) error
+	RevokeRefreshToken(ctx context.Context, id string) error
 	UpdateVoterStatus(ctx context.Context, arg UpdateVoterStatusParams) (Voter, error)
 }
 
