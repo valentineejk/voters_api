@@ -2,6 +2,7 @@ package handler
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"regexp"
 	"strings"
@@ -255,6 +256,136 @@ func (h *Handler) Update_voter_status(c *gin.Context) {
 		"data":    voter,
 		"message": "voter status updated succesfully",
 	})
+
+}
+
+
+func (h *Handler) AddPollingStation(c *gin.Context) {
+
+	var req model.CreatePollingStationRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   err.Error(),
+			"message": "invalid body data",
+		})
+		return
+	}
+
+	code, err := helpers.GeneratePollingStationCode()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err.Error(),
+			"message": "failed to generate polling station code",
+		})
+		return
+	}
+
+	var lat pgtype.Numeric
+	if req.Latitude != nil {
+		if err := lat.Scan(fmt.Sprintf("%f", *req.Latitude)); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":   err.Error(),
+				"message": "invalid latitude format",
+			})
+			return
+		}
+	} else {
+		lat.Valid = false
+	}
+
+	var lng pgtype.Numeric
+	if req.Longitude != nil {
+		if err := lng.Scan(fmt.Sprintf("%f", *req.Longitude)); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error":   err.Error(),
+				"message": "invalid longitude format",
+			})
+			return
+		}
+	} else {
+		lng.Valid = false
+	}
+
+	var addressPtr *string
+	if req.Address != "" {
+		addressPtr = &req.Address
+	}
+
+	station, err := h.queries.CreatePollingStation(c.Request.Context(), dbq.CreatePollingStationParams{
+		ID:        helpers.GenerateVoterID(),
+		Code:      code,
+		Name:      req.Name,
+		State:     req.State,
+		Lga:       req.Lga,
+		Ward:      req.Ward,
+		Address:   addressPtr,
+		Latitude:  lat,
+		Longitude: lng,
+		Status:    "active",
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   err.Error(),
+			"message": "failed to save polling station to database",
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"data":    station,
+		"message": "polling station created successfully",
+	})
+}
+
+
+func (h *Handler) GetPollingStation(c *gin.Context) {
+
+	id := c.Param("id")
+
+	if !voterIDPat.MatchString(id) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid polling station id",
+		})
+		return
+	}
+
+	pollingStation, err := h.queries.GetPollingStation(c.Request.Context(), id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.JSON(http.StatusNotFound, gin.H{
+				"error":   "polling station not found",
+				"message": err.Error(),
+			})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "something went wrong",
+			"message": err.Error(),
+		})
+		return
+
+	}
+
+	c.JSON(http.StatusOK, pollingStation)
+
+}	
+
+func (h *Handler) GetAllPollingStations(c *gin.Context) {
+
+	pollingStations, err := h.queries.ListPollingStations(c.Request.Context(), dbq.ListPollingStationsParams{
+		Limit:  100,
+		Offset: 0,
+	})
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error":   "something went wrong",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, pollingStations)
 
 }
 
