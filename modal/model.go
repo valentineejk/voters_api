@@ -15,11 +15,31 @@ type Voter struct {
 
 type RegisterVoterRequest struct {
 	FullName string `json:"full_name" binding:"required,min=3"`
-	NIN      string `json:"nin" binding:"required,len=11"`
+	NIN      string `json:"nin" binding:"required,len=11,numeric"`
 	DOB      string `json:"dob" binding:"required"`
 	State    string `json:"state" binding:"required"`
 	Lga      string `json:"lga" binding:"required"`
 	Phone    string `json:"phone" binding:"required,min=11"`
+}
+
+type RegisterUserRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8"`
+}
+
+// omitempty
+type RegisterUserResponse struct {
+	Email string `json:"email" binding:"required,email"`
+}
+
+type LoginUserRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8"`
+}
+
+// omitempty
+type LoginUserResponse struct {
+	Email string `json:"email" binding:"required,email"`
 }
 
 type PaginatedMeta struct {
@@ -29,4 +49,8 @@ type PaginatedMeta struct {
 	TotalPages int  `json:"total_pages"`
 	HasNext    bool `json:"has_next"`
 	HasPrev    bool `json:"has_prev"`
+}
+
+type UpdateVoterStatusRequest struct {
+	Status string `json:"status" binding:"required"`
 }
