@@ -31,16 +31,15 @@ func main() {
 	protected := v1.Group("/", handler.AuthMiddleware())
 	{
 		protected.GET("/voters/:id", h.Get_one_voter)
+		protected.DELETE("/voters/:id", h.Delete_voter)
+		protected.GET("/voters", h.GetAllVoters)
 	}
 
 	v1.POST("/voters", h.Register_voter)
-	v1.DELETE("/voters/:id", h.Delete_voter)
-	v1.GET("/voters", h.GetAllVoters)
-
 	v1.PUT("/voters/:id/status", h.Update_voter_status)
 	v1.GET("/health", h.HealthCheck)
 
-	auth := r.Group("/api/v1/auth")
+	auth := v1.Group("/auth")
 	auth.POST("/register", h.RegisterHandler)
 	auth.POST("/login", h.Login)
 	auth.POST("/refresh", h.RefreshToken)
