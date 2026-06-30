@@ -29,6 +29,9 @@ func main() {
 
 	v1.POST("/voters", h.Register_voter)
 	v1.GET("/voters/:id", h.Get_one_voter)
+
+	v1.GET("/voters", h.GetAllVoters)
+
 	v1.PUT("/voters/:id/status", h.Update_voter_status)
 	v1.GET("/health", h.HealthCheck)
 
