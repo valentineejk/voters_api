@@ -237,6 +237,15 @@ func (h *Handler) Register_voter(c *gin.Context) {
 		return
 	}
 
+	//state validation
+	if !helpers.ValidateState(req.State) {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error":   "invalid state",
+			"message": "Well, the state must be a valid Nigerian state",
+		})
+		return
+	}
+
 	//nin check
 	_, err := h.queries.GetVoterByNIN(c.Request.Context(), req.NIN)
 	if err == nil {

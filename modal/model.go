@@ -15,11 +15,11 @@ type Voter struct {
 
 type RegisterVoterRequest struct {
 	FullName string `json:"full_name" binding:"required,min=3"`
-	NIN      string `json:"nin" binding:"required, numeric"`
+	NIN      string `json:"nin" binding:"required,len=11,numeric"`
 	DOB      string `json:"dob" binding:"required"`
 	State    string `json:"state" binding:"required"`
 	Lga      string `json:"lga" binding:"required"`
-	Phone    string `json:"phone" binding:"required"`
+	Phone    string `json:"phone" binding:"required,min=11"`
 }
 
 type RegisterUserRequest struct {
