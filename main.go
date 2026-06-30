@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	database "github.com/valentineejk/voters_api/database/postgres"
-	"github.com/valentineejk/voters_api/handler"
+	"github.com/valentineejk/voters_api/internal/handler"
 )
 
 func main() {
@@ -27,11 +27,14 @@ func main() {
 
 	v1 := r.Group("/api/v1")
 
-	v1.POST("/voters", h.Register_voter)
-	v1.GET("/voters/:id", h.Get_one_voter)
-	v1.DELETE("/voters/:id", h.Delete_voter)
-	v1.PUT("/voters/:id/status", h.Update_voter_status)
+	//protected routes
+	protected := v1.Group("/", handler.AuthMiddleware())
+	{
+		protected.GET("/voters/:id", h.Get_one_voter)
+	}
 
+	v1.POST("/voters", h.Register_voter)
+	v1.DELETE("/voters/:id", h.Delete_voter)
 	v1.GET("/voters", h.GetAllVoters)
 
 	v1.PUT("/voters/:id/status", h.Update_voter_status)
@@ -40,11 +43,10 @@ func main() {
 	auth := r.Group("/api/v1/auth")
 	auth.POST("/register", h.RegisterHandler)
 	auth.POST("/login", h.Login)
+	auth.POST("/refresh", h.RefreshToken)
 
 	r.Run(PORT)
 
 }
 
-//update_voter_status -
-//get_all_voters -
-//add state vildation function to the create voter, valid nin to the struct, valid phone
+//revoke - take home group

@@ -54,3 +54,7 @@ type PaginatedMeta struct {
 type UpdateVoterStatusRequest struct {
 	Status string `json:"status" binding:"required"`
 }
+
+type RefreshToken struct {
+	RefreshToken string `json:"refresh_token" binding:"required"`
+}

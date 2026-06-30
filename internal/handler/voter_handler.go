@@ -13,14 +13,14 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	dbq "github.com/valentineejk/voters_api/database/sqlc"
-	"github.com/valentineejk/voters_api/helpers"
-	model "github.com/valentineejk/voters_api/modal"
+	"github.com/valentineejk/voters_api/internal/helpers"
+	model "github.com/valentineejk/voters_api/internal/model"
 )
 
 var (
 	voterIDPat = regexp.MustCompile(`^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`)
 	validStatus = map[string]bool{
-		"pending": true,
+		"pending":  true,
 		"verified": true,
 		"rejected": true,
 	}
@@ -108,19 +108,18 @@ func (h *Handler) GetAllVoters(c *gin.Context) {
 		limit = 100
 	}
 
-
 	params := dbq.ListVotersParams{
-		Limit: int32(limit),
+		Limit:  int32(limit),
 		Offset: int32((page - 1) * limit),
-		State: stateAddress,
+		State:  stateAddress,
 		Status: statusAddress,
 	}
-	
+
 	voters, err := h.queries.ListVoters(c, params)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			c.JSON(http.StatusNotFound, gin.H{
-				"error": "voter not found",
+				"error":   "voter not found",
 				"message": err.Error(),
 			})
 			return
@@ -132,7 +131,7 @@ func (h *Handler) GetAllVoters(c *gin.Context) {
 	}
 
 	total := len(voters)
-	totalPages := int(math.Ceil(float64(total/limit)))
+	totalPages := int(math.Ceil(float64(total / limit)))
 	start := (page - 1) * limit
 	end := start + limit
 	if start > total {
@@ -145,15 +144,15 @@ func (h *Handler) GetAllVoters(c *gin.Context) {
 	c.JSON(http.StatusOK, map[string]any{
 		"data": voters,
 		"meta": model.PaginatedMeta{
-			Page: page,
-			Limit: limit,
-			Total: total,
-			TotalPages:	totalPages,
-			HasNext: page < totalPages,
-			HasPrev: page > 1,
+			Page:       page,
+			Limit:      limit,
+			Total:      total,
+			TotalPages: totalPages,
+			HasNext:    page < totalPages,
+			HasPrev:    page > 1,
 		},
 	})
-	
+
 }
 
 func (h *Handler) Get_one_voter(c *gin.Context) {
@@ -196,6 +195,7 @@ func (h *Handler) Get_one_voter(c *gin.Context) {
 			"message": err.Error(),
 		})
 		return
+
 	}
 
 	c.JSON(http.StatusOK, voter)
@@ -291,29 +291,6 @@ func (h *Handler) Register_voter(c *gin.Context) {
 	})
 
 }
-
-// func delete_voter(w http.ResponseWriter, r *http.Request) {
-
-// 	id := r.PathValue("id")
-// 	//voters id check
-// 	if !voterIDPat.MatchString(id) {
-// 		writeError(w, http.StatusBadRequest, "invalid voter id format")
-// 		return
-// 	}
-// 	mu.Lock()
-// 	defer mu.Unlock()
-// 	v, ok := store[id]
-
-// 	if !ok {
-// 		writeError(w, http.StatusNotFound, "voters not found")
-// 		return
-// 	}
-
-// 	delete(store, id)
-// 	delete(ninIndex, v.NIN)
-// 	w.WriteHeader(http.StatusNoContent)
-
-// }
 
 func (h *Handler) Update_voter_status(c *gin.Context) {
 

@@ -29,7 +29,7 @@ func GenerateAccess(UserID, Role string) (string, error) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			Subject:   UserID,
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(30 * time.Minute)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(1 * time.Minute)),
 		},
 	}
 
@@ -41,6 +41,7 @@ func GenerateAccess(UserID, Role string) (string, error) {
 // generate refresh
 // takehome - chcek for token type
 // change refreh to nanoid(12)
+
 func GenerateRefresh(UserID, Role string) (string, error) {
 
 	Claims := Claims{
@@ -58,7 +59,7 @@ func GenerateRefresh(UserID, Role string) (string, error) {
 }
 
 // validate
-func Vaidate(tokenStr string) (*Claims, error) {
+func Validate(tokenStr string) (*Claims, error) {
 
 	token, err := jwt.ParseWithClaims(tokenStr, &Claims{},
 		func(t *jwt.Token) (interface{}, error) {
