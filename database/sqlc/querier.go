@@ -20,6 +20,7 @@ type Querier interface {
 	GetUserByID(ctx context.Context, id string) (User, error)
 	GetVoter(ctx context.Context, id string) (Voter, error)
 	GetVoterByNIN(ctx context.Context, nin string) (Voter, error)
+	GetVoterByVoterID(ctx context.Context, id string) (Voter, error)
 	ListVoters(ctx context.Context, arg ListVotersParams) ([]Voter, error)
 	RevokeAllUserTokens(ctx context.Context, userID string) error
 	RevokeRefreshToken(ctx context.Context, id string) error

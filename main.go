@@ -29,6 +29,8 @@ func main() {
 
 	v1.POST("/voters", h.Register_voter)
 	v1.GET("/voters/:id", h.Get_one_voter)
+	v1.DELETE("/voters/:id", h.Delete_voter)
+	v1.PUT("/voters/:id/status", h.Update_voter_status)
 
 	v1.GET("/voters", h.GetAllVoters)
 
@@ -44,6 +46,5 @@ func main() {
 }
 
 //update_voter_status -
-//delete_voter -
 //get_all_voters -
 //add state vildation function to the create voter, valid nin to the struct, valid phone

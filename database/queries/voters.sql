@@ -37,3 +37,7 @@ RETURNING *;
 -- name: DeleteVoter :exec
 DELETE FROM voters
 WHERE id = $1;
+
+-- name: GetVoterByVoterID :one
+SELECT * FROM voters
+WHERE voter_id = $1;

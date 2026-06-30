@@ -158,6 +158,21 @@ func (h *Handler) GetAllVoters(c *gin.Context) {
 
 func (h *Handler) Get_one_voter(c *gin.Context) {
 
+	// when voter_id query param is present, skip path-based id extraction
+	if voterID := c.Query("voter_id"); voterID != "" {
+		voter, err := h.queries.GetVoterByVoterID(c.Request.Context(), voterID)
+		if err != nil {
+			if errors.Is(err, pgx.ErrNoRows) {
+				c.JSON(http.StatusNotFound, gin.H{"error": "voter not found"})
+				return
+			}
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+			return
+		}
+		c.JSON(http.StatusOK, voter)
+		return
+	}
+
 	id := c.Param("id")
 
 	if !voterIDPat.MatchString(id) {
@@ -181,12 +196,32 @@ func (h *Handler) Get_one_voter(c *gin.Context) {
 			"message": err.Error(),
 		})
 		return
-
 	}
 
-	//TODO: add another check
-
 	c.JSON(http.StatusOK, voter)
+
+}
+
+func (h *Handler) Delete_voter(c *gin.Context) {
+
+	id := c.Param("id")
+
+	if !voterIDPat.MatchString(id) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid voter id"})
+		return
+	}
+
+	err := h.queries.DeleteVoter(c.Request.Context(), id)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "voter not found"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "something went wrong"})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
 
 }
 
